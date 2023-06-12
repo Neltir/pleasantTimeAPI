@@ -2,16 +2,14 @@
 use Firebase\JWT\JWT;
 require_once "dbConnect.php";
 // require_once "./vendor/firebase/php-jwt/src/JWT.php";
-// header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Origin: http://localhost:4200");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    // Respond to the OPTIONS request with a 200 (OK) status code
-    http_response_code(200);
-    exit();
-}
+// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+//     http_response_code(200);
+//     exit();
+// }
 
 $postdata = file_get_contents("php://input");
 if(isset($postdata) && !empty($postdata))
@@ -34,7 +32,6 @@ if(isset($postdata) && !empty($postdata))
         exit;
 
     } else{
-
         $query = 'SELECT * FROM users WHERE username = :username';
         $stmt = $db->prepare($query);
         $stmt->bindParam(':username', $username);
@@ -46,8 +43,8 @@ if(isset($postdata) && !empty($postdata))
                 if($user){
                     // $tokenID = base64_encode(random_bytes(32));
                     // echo json_encode(array('mdp' => $user));
-                    // if(password_verify($password, $user['password'])){
-                    if($password == $user['password']){
+                    if(password_verify($password, $user['password'])){
+                    // if($password == $user['password']){
                         // mot de passe correct
                         $timestamp = time();
                         $expire = $timestamp + 3600;
@@ -59,7 +56,8 @@ if(isset($postdata) && !empty($postdata))
                             'exp' => $expire,
                             'data' => array(
                                 'userID' => $user['userID'],
-                                'username' => $user['username']
+                                'username' => $user['username'],
+                                'isAdmin' => $user['isAdmin']
                             )
                         );
                         // on ecncode le token , hs256 est algo d'encode
